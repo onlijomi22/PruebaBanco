@@ -1,0 +1,45 @@
+services:
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: sqlserver
+    ports:
+      - "1433:1433"
+    environment:
+      SA_PASSWORD: "Glob19Ast35XX$"
+      ACCEPT_EULA: "Y"
+    networks:
+      - banco-net
+
+  cliente-service:
+    build: ./client-service
+    container_name: cliente-service
+    ports:
+      - "8081:8081"
+    depends_on:
+      - sqlserver
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:sqlserver://sqlserver:1433;databaseName=BancosClientes;encrypt=true;trustServerCertificate=true
+      SPRING_DATASOURCE_USERNAME: sa
+      SPRING_DATASOURCE_PASSWORD: Glob19Ast35XX$
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+    networks:
+      - banco-net
+
+  account-service:
+    build: ./account-service
+    container_name: account-service
+    ports:
+      - "8082:8082"
+    depends_on:
+      - sqlserver
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:sqlserver://sqlserver:1433;databaseName=BancosCuentas;encrypt=true;trustServerCertificate=true
+      SPRING_DATASOURCE_USERNAME: sa
+      SPRING_DATASOURCE_PASSWORD: Glob19Ast35XX$
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+    networks:
+      - banco-net
+
+networks:
+  banco-net:
+    driver: bridge

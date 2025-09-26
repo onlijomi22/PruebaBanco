@@ -1,0 +1,29 @@
+services:
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: sqlserver
+    environment:
+      - ACCEPT_EULA=Y
+      - SA_PASSWORD=Glob19Ast35XX$
+    ports:
+      - "1433:1433"
+    networks:
+      - banco-net
+
+  client-service:
+    build: ./client-service
+    container_name: client-service
+    ports:
+      - "8081:8081"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:sqlserver://sqlserver:1433;databaseName=Bancos;encrypt=false
+      - SPRING_DATASOURCE_USERNAME=sa
+      - SPRING_DATASOURCE_PASSWORD=YourStrong!Passw0rd
+    depends_on:
+      - sqlserver
+    networks:
+      - banco-net
+
+networks:
+  banco-net:
+    driver: bridge
